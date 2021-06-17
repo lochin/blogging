@@ -4,9 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth')->except('index');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +35,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('post.create');
     }
 
     /**
@@ -35,7 +46,18 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        $post = new Post;
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->user_id = Auth::id();
+        $post->save();
+
+        return redirect()->route('posts.index');
     }
 
     /**
